@@ -7,10 +7,10 @@ const resolvers = {
     users: async () => {
       return User.find({});
     },
-    books: async (parent, { bookId }) => {
-      const params = bookId ? { bookId } : {};
-      return Book.find(params);
-    },
+    // books: async (parent, { bookId }) => {
+    //   const params = bookId ? { bookId } : {};
+    //   return Book.find(params);
+    // },
     user: async (parent, { username }) => {
         return User.findOne({ username }).populate('savedBooks');
       },
@@ -38,6 +38,18 @@ const resolvers = {
   
         return { token, user };
       },
+      saveBook: async (parent, { bookId, description, title }, context) =>{
+        const book = {
+            bookId,
+            description,
+            title,
+        };
+         await User.findOneAndUpdate(
+            { _id: context.user._id},
+            {$addToSet: { savedBooks: book}}
+        );
+        return book;
+      }
   },
 };
 

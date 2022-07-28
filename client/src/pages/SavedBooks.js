@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
-
+import { useMutation } from '@apollo/client';
 
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
+import { REMOVE_BOOK } from '../utils/mutations';
 
 const SavedBooks = () => {
   const [loading, userData] = useQuery(QUERY_ME);
@@ -17,14 +18,8 @@ const SavedBooks = () => {
     }
 
     try {
-      const response = await deleteBook(bookId, token);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
+      const [removeBook, { error }]= useMutation(REMOVE_BOOK);
+      removeBook(bookId);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
